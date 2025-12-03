@@ -35,7 +35,7 @@ AVATAR achieves strong performance across various benchmarks, outperforming the 
 - [x] Release Inference Code.
 - [x] Release eval scripts for all benchmarks.
 - [x] Stage wise training data.
-- [x] Release GRPO Trainer with TAS.
+- [] Release GRPO Trainer with TAS.
 
 ## 📦 Install
 
