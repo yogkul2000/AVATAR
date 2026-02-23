@@ -1,5 +1,6 @@
 <h2 align="center"> <a href="https://arxiv.org/abs/2508.03100">AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video
 </a></h2>
+<h3 align="center">CVPR 2026</h3>
 <div align="center">
 
 
@@ -23,10 +24,12 @@ AVATAR achieves strong performance across various benchmarks, outperforming the 
 
 <table class="center">
     <tr>
-    <td><img src="assets/avatar.png" alt="AVATAR Overview Diagram"></td>
+        <td align="center">
+            <img src="assets/avatar.png" style="width: 40%;" alt="AVATAR Overview Diagram">
+        </td>
     </tr>
     <tr>
-    <td align="center"><em>Overview of the AVATAR.</em></td>
+        <td align="center"><em>Overview of the AVATAR.</em></td>
     </tr>
 </table>
 
@@ -36,7 +39,7 @@ AVATAR achieves strong performance across various benchmarks, outperforming the 
 - [x] Release Inference Code.
 - [x] Release eval scripts for all benchmarks.
 - [x] Stage wise training data.
-- [] Release GRPO Trainer with TAS.
+- [x] Release GRPO Trainer with TAS.
 
 ## 📦 Install
 
@@ -62,20 +65,82 @@ pip install decord opencv-python pillow numpy
 pip install qwen-omni-utils[decord] -U
 ```
 
+### MS-Swift Setup
+
+```bash
+cd ms-swift
+pip install -e .
+```
+
 ### Individual Benchmark Evaluation
 All eval for benchmarks in eval folder. Paths hardcoded for now.
+
+## 🚀 Training AVATAR (GRPO + TAS + Replay)
+
+Use the provided script and edit paths/flags as needed:
+
+```bash
+bash ms-swift/examples/train/grpo/qwen2_5_omni/grpo.sh
+```
+
+## 🔧 Parameters (AVATAR-Specific)
+
+These parameters control AVATAR behavior. Defaults reflect the AVATAR implementation in this repo.
+
+1. Replay
+   - `--tas_enable`: Enables replay + TAS logic.
+   - `--tas_replay_buffer_size`: Total buffer size (stratified).
+   - `--tas_replay_min_size`: Minimum buffer size before off-policy replay starts.
+   - `--tas_on_policy_batches`: On-policy batches per rollout cycle.
+   - `--tas_off_policy_batches`: Off-policy batches per rollout cycle.
+   - `--steps_per_generation`: Total batches per rollout cycle. Must equal `on_policy + off_policy`.
+
+2. VCRS (advantage normalization for replay)
+   - `--tas_vcrs_window`: Moving window size for per-prompt reward statistics.
+   - `--tas_off_policy_alpha`: Scaling factor for off-policy advantages.
+
+3. TAS (Temporal Advantage Shaping)
+   - `--tas_lambda`: Strength of temporal weighting (higher = more emphasis on later steps).
+
+4. Hinting
+   - `--tas_hint_key`: Dataset field containing the hint string.
+   - `--tas_hint_zero_patience`: Apply hint after N consecutive zero-reward attempts for the same prompt.
+   - `--tas_hint_always`: Force hints on every sample.
+   - `--tas_hint_reward_threshold`: Apply hint if average reward is below threshold.
+   - `--tas_hint_kl_threshold`: Apply hint if KL is above threshold.
+
+5. Logging
+   - During training you should see logs like:
+     - `[AVATAR] replay=1 on=4 off=4 buffer=XXXX vcrs_prompts=YYY`
+   - `replay=1` indicates off-policy samples were mixed into the current rollout cycle.
+
+## 🧪 Stage-wise Training (Paper)
+
+The paper runs three stages with different reward signals. Run them as separate jobs.
+
+1. Stage 1 (Accuracy + Format)
+   - `--reward_funcs custom_accuracy_reward custom_format_reward`
+   - `--reward_weights 1 0.5`
+
+2. Stage 2 (Self-Consistency / Rself)
+   - `--reward_funcs self_reward custom_format_reward`
+   - `--reward_weights 1 0.5`
+
+3. Stage 3 (Judge Reward)
+   - `--reward_funcs judge_reward custom_format_reward`
+   - `--reward_weights 1 0.5`
+   - Requires InternVL3 model for judging. Set `INTERNVL3_PATH` if using a local checkpoint.
 
 ## 📝 Citation
 If you find AVATAR useful for your research, please cite our paper:
 ```bib
-@article{kulkarni2025avatar,
+@inproceedings{kulkarni2026avatar,
   title={AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video},
   author={Kulkarni, Yogesh and Fazli, Pooyan},
-  journal={arXiv preprint arXiv:2508.03100},
-  year={2025}
+  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year={2026}
 }
 ```
 
 ## 📪 Contact
 For questions about the paper, please contact Yogesh Kulkarni at `ykulka10@asu.edu`. You can also open an issue in this GitHub repository for bugs or specific questions related to the code.
-
