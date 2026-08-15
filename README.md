@@ -1,3 +1,6 @@
+
+</think>
+
 <h2 align="center"> <a href="https://arxiv.org/abs/2508.03100">AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video
 </a></h2>
 <h3 align="center">CVPR 2026</h3>
@@ -73,7 +76,7 @@ pip install -e .
 ```
 
 ### Individual Benchmark Evaluation
-All eval for benchmarks in eval folder. Paths hardcoded for now.
+All evaluation scripts are located in the `eval` folder. Dataset paths within these scripts are currently hardcoded and must be updated to your local directory.
 
 ## 🚀 Training AVATAR (GRPO + TAS + Replay)
 
